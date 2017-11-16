@@ -28,7 +28,7 @@ class Main extends SimpleFileVisitor<Path> {
             Path targetFile = targetDir.resolve(sourceDir.relativize(file));
             Files.copy(file, targetFile);
         } catch (IOException ex) {
-            System.err.println("IO Error");
+            System.err.println("IO Error File");
         }
 
         return FileVisitResult.CONTINUE;
@@ -41,13 +41,20 @@ class Main extends SimpleFileVisitor<Path> {
             Path newDir = targetDir.resolve(sourceDir.relativize(dir));
             Files.createDirectory(newDir);
         } catch (IOException ex) {
-            System.err.println("IO Error");
+            System.err.println("Specify a directory");
+            System.exit(0);
         }
 
         return FileVisitResult.CONTINUE;
     }
 
     public static void main(String[] args) throws IOException {
+
+        if (args.length == 0) {
+            System.out.println("Example: java -jar backup_service.jar SRC_DIR DST_DIR");
+            System.exit(0);
+        }
+
         Path sourceDir = Paths.get(args[0]);
         Path targetDir = Paths.get(args[1]);
 
