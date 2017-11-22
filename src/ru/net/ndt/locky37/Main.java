@@ -49,35 +49,29 @@ class Main extends SimpleFileVisitor<Path> {
 
     public static void main(String[] args) throws IOException {
 
-        System.out.println(System.getProperty("java.io.tmpdir"));
+        Path sourceDir;
+        Path targetDir;
 
-        /*if (args.length == 0) {
+        if (args.length == 0) {
             System.out.println("Example: java -jar backup_service.jar SRC_DIR DST_DIR");
+            System.out.println("Example with ZIP: java -jar backup_service.jar -Z SRC_DIR DST_DIR");
             System.exit(0);
-        }*/
+        } else if (args[0].equals("-c")) {
+            System.out.println("modification = c");
+            sourceDir = Paths.get(args[1]);
+            targetDir = Paths.get(args[2]);
 
-        Path sourceDir = Paths.get(args[0]);
-        Path targetDir = Paths.get(args[1]);
+            File dir = new File(String.valueOf(sourceDir));
+            String zipDirName = String.valueOf(targetDir);
 
-        System.out.println(sourceDir);
-        System.out.println(targetDir);
-        System.out.println(targetDir.getFileName());
-
-        ////System.out.println(targetDir.getName(Integer.parseInt(args[1])));
-        //File file = new File("E:\\Test\\test.test");
-        //String zipFileName = "C:\\Test\\File_test.zip";
-
-        // "E:\\Test"
-        File dir = new File(String.valueOf(sourceDir));
-        //"C:\\Test\\Folder_test.zip"
-        String tmpfolder = System.getProperty("java.io.tmpdir");
-        String zipDirName = tmpfolder + targetDir;
-
-        //Compress.zipSingleFile(file, zipFileName);
-
-        /////Compress zipFiles = new Compress();
-        /////zipFiles.zipDirectory(dir, zipDirName);
-
-        /////Files.walkFileTree(sourceDir, new Main(sourceDir, targetDir));
+            Compress zipFiles = new Compress();
+            zipFiles.zipDirectory(dir, zipDirName);
+            System.out.println("Copy with compression complete!");
+        } else {
+            sourceDir = Paths.get(args[0]);
+            targetDir = Paths.get(args[1]);
+            Files.walkFileTree(sourceDir, new Main(sourceDir, targetDir));
+            System.out.println("Copy complete!");
+        }
     }
 }
