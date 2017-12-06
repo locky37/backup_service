@@ -49,12 +49,14 @@ class Main extends SimpleFileVisitor<Path> {
 
     public static void main(String[] args) throws IOException {
 
+
         Path sourceDir;
         Path targetDir;
 
+
         if (args.length == 0) {
             System.out.println("Example: java -jar backup_service.jar SRC_DIR DST_DIR");
-            System.out.println("Example with ZIP: java -jar backup_service.jar -Z SRC_DIR DST_DIR");
+            System.out.println("Example with ZIP: java -jar backup_service.jar -c SRC_DIR DST_DIR");
             System.exit(0);
         } else if (args[0].equals("-c")) {
             System.out.println("modification = c");

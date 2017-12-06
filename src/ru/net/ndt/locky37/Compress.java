@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -12,21 +13,6 @@ import java.util.zip.ZipOutputStream;
 public class Compress {
 
     List<String> filesListInDir = new ArrayList<>();
-
-/*
-    public static void main(String[] args) {
-        File file = new File("E:\\Test\\test.test");
-        String zipFileName = "C:\\Test\\File_test.zip";
-
-        File dir = new File("E:\\Test");
-        String zipDirName = "C:\\Test\\Folder_test.zip";
-
-        zipSingleFile(file, zipFileName);
-
-        Compress zipFiles = new Compress();
-        zipFiles.zipDirectory(dir, zipDirName);
-    }
-*/
 
     /**
      * This method zips the directory
@@ -84,10 +70,13 @@ public class Compress {
      * @param zipFileName
      */
     public static void zipSingleFile(File file, String zipFileName) {
+
+        Charset charset = Charset.forName("cp866");
+
         try {
             //create ZipOutputStream to write to the zip file
             FileOutputStream fos = new FileOutputStream(zipFileName);
-            ZipOutputStream zos = new ZipOutputStream(fos);
+            ZipOutputStream zos = new ZipOutputStream(fos, charset);
             //add a new Zip Entry to the ZipOutputStream
             ZipEntry ze = new ZipEntry(file.getName());
             zos.putNextEntry(ze);
