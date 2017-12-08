@@ -1,4 +1,4 @@
-package ru.net.ndt.locky37;
+package ru.net.ndt.locky37.main;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,7 +14,7 @@ public class Compress {
     List<String> filesListInDir = new ArrayList<>();
 
 /*
-    public static void main(String[] args) {
+    public static void ru.net.ndt.locky37.main(String[] args) {
         File file = new File("E:\\Test\\test.test");
         String zipFileName = "C:\\Test\\File_test.zip";
 
