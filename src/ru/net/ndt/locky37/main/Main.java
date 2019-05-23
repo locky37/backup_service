@@ -1,9 +1,11 @@
-package ru.net.ndt.locky37;
+package ru.net.ndt.locky37.main;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+
+import ru.net.ndt.locky37.socket.*;
 
 /**
  * This program copies a whole directory (including its sub files and
@@ -12,8 +14,9 @@ import java.nio.file.attribute.BasicFileAttributes;
  * @author www.codejava.net
  */
 
-class Main extends SimpleFileVisitor<Path> {
-    private Path sourceDir;
+class Main {
+        //extends SimpleFileVisitor<Path> {
+/*    private Path sourceDir;
     private Path targetDir;
 
     private Main(Path sourceDir, Path targetDir) {
@@ -45,9 +48,9 @@ class Main extends SimpleFileVisitor<Path> {
         }
 
         return FileVisitResult.CONTINUE;
-    }
+    }*/
 
-    public static void main(String[] args) throws IOException {
+/*    public static String archive(String[] args) throws IOException {
 
 
         Path sourceDir;
@@ -75,5 +78,39 @@ class Main extends SimpleFileVisitor<Path> {
             Files.walkFileTree(sourceDir, new Main(sourceDir, targetDir));
             System.out.println("Copy complete!");
         }
+        return null;
+    }*/
+
+    public static void main(String[] args) throws IOException {
+
+       // Path sourceDir;
+        //Path targetDir;
+
+        if (args.length == 0) {
+            System.out.println("Example: java -jar backup_service.jar SRC_DIR DST_DIR");
+            System.out.println("Example with ZIP: java -jar backup_service.jar -c SRC_DIR DST_DIR");
+            System.out.println("Example with ZIP: java -jar backup_service.jar -server DST_DIR");
+            System.out.println("Example with ZIP: java -jar backup_service.jar -client SRC_DIR");
+            System.exit(0);
+        } else if (args[0].equals("-server")) {
+            System.out.println("modification = server");
+            try {
+                while (true) {
+                    ServerZip server = new ServerZip();
+                    server.serverZip(args[1]);
+                    System.out.println("Copy with compression complete!");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        /*else if (args[0].equals("-client")) {
+
+        } else if (args[0].equals("-c")) {
+        }
+
+
+        ServerZip server = new ServerZip();
+        server.serverZip(args[0]);*/
     }
 }
