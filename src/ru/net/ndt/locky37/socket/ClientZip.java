@@ -6,9 +6,9 @@ import java.net.Socket;
 
 public class ClientZip {
 
-    public static void main(String[] args) throws IOException {
-        String directory = "C:\\Test";
-        String hostDomain = "localhost";
+    public void clientZip(String hostName, String srcDir) throws IOException {
+        String directory = srcDir;
+        String hostDomain = hostName;
         int port = 1234;
 
         File[] files = new File(directory).listFiles();

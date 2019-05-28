@@ -1,10 +1,10 @@
 package ru.net.ndt.locky37.main;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import ru.net.ndt.locky37.zip.Compress;
 import ru.net.ndt.locky37.socket.*;
 
 /**
@@ -14,9 +14,8 @@ import ru.net.ndt.locky37.socket.*;
  * @author www.codejava.net
  */
 
-class Main {
-        //extends SimpleFileVisitor<Path> {
-/*    private Path sourceDir;
+class Main extends SimpleFileVisitor<Path> {
+    private Path sourceDir;
     private Path targetDir;
 
     private Main(Path sourceDir, Path targetDir) {
@@ -48,49 +47,18 @@ class Main {
         }
 
         return FileVisitResult.CONTINUE;
-    }*/
+    }
 
-/*    public static String archive(String[] args) throws IOException {
-
+    public static void main(String[] args) throws IOException {
 
         Path sourceDir;
         Path targetDir;
 
-
         if (args.length == 0) {
             System.out.println("Example: java -jar backup_service.jar SRC_DIR DST_DIR");
-            System.out.println("Example with ZIP: java -jar backup_service.jar -c SRC_DIR DST_DIR");
-            System.exit(0);
-        } else if (args[0].equals("-c")) {
-            System.out.println("modification = c");
-            sourceDir = Paths.get(args[1]);
-            targetDir = Paths.get(args[2]);
-
-            File dir = new File(String.valueOf(sourceDir));
-            String zipDirName = String.valueOf(targetDir);
-
-            Compress zipFiles = new Compress();
-            zipFiles.zipDirectory(dir, zipDirName);
-            System.out.println("Copy with compression complete!");
-        } else {
-            sourceDir = Paths.get(args[0]);
-            targetDir = Paths.get(args[1]);
-            Files.walkFileTree(sourceDir, new Main(sourceDir, targetDir));
-            System.out.println("Copy complete!");
-        }
-        return null;
-    }*/
-
-    public static void main(String[] args) throws IOException {
-
-       // Path sourceDir;
-        //Path targetDir;
-
-        if (args.length == 0) {
-            System.out.println("Example: java -jar backup_service.jar SRC_DIR DST_DIR");
-            System.out.println("Example with ZIP: java -jar backup_service.jar -c SRC_DIR DST_DIR");
+            System.out.println("Example with ZIP: java -jar backup_service.jar -c SRC_DIR DST_ZIP_FILE");
             System.out.println("Example with ZIP: java -jar backup_service.jar -server DST_DIR");
-            System.out.println("Example with ZIP: java -jar backup_service.jar -client SRC_DIR");
+            System.out.println("Example with ZIP: java -jar backup_service.jar -client hostname SRC_DIR");
             System.exit(0);
         } else if (args[0].equals("-server")) {
             System.out.println("modification = server");
@@ -98,19 +66,37 @@ class Main {
                 while (true) {
                     ServerZip server = new ServerZip();
                     server.serverZip(args[1]);
-                    System.out.println("Copy with compression complete!");
+                    System.out.println("Server Copy with compression complete!");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        /*else if (args[0].equals("-client")) {
+        } else if (args[0].equals("-client")) {
+            System.out.println("modification = client");
+
+            ClientZip client = new ClientZip();
+            client.clientZip(args[1],args[2]);
+            System.out.println("Client Copy with compression complete!");
 
         } else if (args[0].equals("-c")) {
-        }
+            System.out.println("modification = c");
+            sourceDir = Paths.get(args[1]);
+            targetDir = Paths.get(args[2]);
 
+            String dir = String.valueOf(sourceDir);
+            String zipDirName = String.valueOf(targetDir);
 
-        ServerZip server = new ServerZip();
+            Compress zipFiles = new Compress();
+            zipFiles.zipDirectory(dir, zipDirName);
+            System.out.println("Copy with compression complete!");
+        } else if (args[1].length() != 0 && args[2].length() != 0) {
+            sourceDir = Paths.get(args[0]);
+            targetDir = Paths.get(args[1]);
+            Files.walkFileTree(sourceDir, new Main(sourceDir, targetDir));
+            System.out.println("Copy complete!");
+        } else System.out.println("Nothing");
+
+        /*ServerZip server = new ServerZip();
         server.serverZip(args[0]);*/
     }
 }

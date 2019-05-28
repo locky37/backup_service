@@ -24,6 +24,8 @@ public class ServerZip {
             long fileLength = dis.readLong();
             String fileName = dis.readUTF();
 
+            System.out.println("Copy File: " + fileName);
+
             files[i] = new File(dirDst + "/" + fileName);
 
             FileOutputStream fos = new FileOutputStream(files[i]);
