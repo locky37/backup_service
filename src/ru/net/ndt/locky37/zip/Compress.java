@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -20,11 +21,11 @@ public class Compress {
      * @param dir
      * @param zipDirName
      */
-    public void zipDirectory(String dir, String zipDirName) {
-        File directory = new File(dir);
+    public void zipDirectory(Path dir, Path zipDirName) {
+        File directory = new File(String.valueOf(dir));
         getFileList(directory);
 
-        try (FileOutputStream fos = new FileOutputStream(zipDirName);
+        try (FileOutputStream fos = new FileOutputStream(String.valueOf(zipDirName));
              ZipOutputStream zos = new ZipOutputStream(fos)) {
 
             for (String filePath : filesListInDir) {
@@ -56,7 +57,7 @@ public class Compress {
     }
 
     private void getFileList(File directory) {
-/*        int i = 0;*/
+        /*        int i = 0;*/
         File[] files = directory.listFiles();
         if (files != null && files.length > 0) {
             for (File file : files) {

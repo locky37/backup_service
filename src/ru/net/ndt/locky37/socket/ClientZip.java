@@ -20,8 +20,7 @@ public class ClientZip {
 
         dos.writeInt(files != null ? files.length : 0);
 
-        for(File file : files != null ? files : new File[0])
-        {
+        for (File file : files != null ? files : new File[0]) {
             long length = file.length();
             dos.writeLong(length);
 
@@ -32,7 +31,7 @@ public class ClientZip {
             BufferedInputStream bis = new BufferedInputStream(fis);
 
             int theByte = 0;
-            while((theByte = bis.read()) != -1) bos.write(theByte);
+            while ((theByte = bis.read()) != -1) bos.write(theByte);
 
             bis.close();
         }
