@@ -11,7 +11,7 @@ public class ServerZip {
         //"E:\\Test\\Test2"
         //String dirPath = dir;
 
-        ServerSocket serverSocket = new ServerSocket(1234);
+        ServerSocket serverSocket = new ServerSocket(3670);
         Socket socket = serverSocket.accept();
 
         BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());

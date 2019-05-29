@@ -7,13 +7,11 @@ import java.net.Socket;
 public class ClientZip {
 
     public void clientZip(String hostName, String srcDir) throws IOException {
-        String directory = srcDir;
-        String hostDomain = hostName;
-        int port = 1234;
+        int port = 3670;
 
-        File[] files = new File(directory).listFiles();
+        File[] files = new File(srcDir).listFiles();
 
-        Socket socket = new Socket(InetAddress.getByName(hostDomain), port);
+        Socket socket = new Socket(InetAddress.getByName(hostName), port);
 
         BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
         DataOutputStream dos = new DataOutputStream(bos);
@@ -30,7 +28,7 @@ public class ClientZip {
             FileInputStream fis = new FileInputStream(file);
             BufferedInputStream bis = new BufferedInputStream(fis);
 
-            int theByte = 0;
+            int theByte;
             while ((theByte = bis.read()) != -1) bos.write(theByte);
 
             bis.close();
