@@ -4,6 +4,7 @@ import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
+import java.lang.Exception
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
@@ -23,7 +24,20 @@ class Compress {
                 zipFileSave.closeEntry()
             }
             val children = fileToZip.listFiles()
+            val listFiles: ArrayList<File> = ArrayList()
+
             for (childFile in children!!) {
+                if (childFile.toString().endsWith(".1cl")
+                        || (childFile.toString().endsWith(".1CL"))
+                        || (childFile.toString().contains("Cv8FTxt"))
+                        || (childFile.toString().contains("1CHelpIndex"))
+                        || (childFile.toString().contains("1Cv8JobScheduler"))
+                )
+                else listFiles.add(childFile)
+            }
+
+            for (childFile in listFiles) {
+                println(childFile)
                 zipFolder(childFile, "$fileName/${childFile.name}", zipFileSave)
             }
             return
@@ -35,7 +49,13 @@ class Compress {
         val zipEntry = ZipEntry(fileName)
         zipFileSave.putNextEntry(zipEntry)
 
-        fileBuffer.copyTo(zipFileSave)
+        try {
+            fileBuffer.copyTo(zipFileSave)
+        } catch (e: Exception) {
+            println("File LOCK")
+        } finally {
+
+        }
 
 
 /*        val bytes = ByteArray(10000)

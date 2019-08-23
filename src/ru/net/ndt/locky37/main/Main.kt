@@ -14,6 +14,7 @@ import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.SimpleFileVisitor
+import java.time.LocalDate
 
 fun main(args: Array<String>) {
 
@@ -23,15 +24,19 @@ fun main(args: Array<String>) {
     if (args.isEmpty()) {
         println("Example Copy Dir: java -jar backup_service.jar source... target")
         println("Example Copy Dir with ZIP: java -jar backup_service.jar -c source... target_file")
-        println("Example Copy Dir with ZIP: java -jar backup_service.jar -server target_dir")
-        println("Example Copy Dir with ZIP: java -jar backup_service.jar -client hostname source_dir")
+        println("Example Copy Dir with ZIP: java -jar backup_service.jar -server PORT target_dir")
+        println("Example Copy Dir with ZIP: java -jar backup_service.jar -client PORT HOSTNAME source_dir")
         exitProcess(0)
     } else if (args[0] == "-server") {
+        val port = Integer.parseInt(args[1])
         println("modification = server")
+        val server = ServerZip()
+        println(port)
+
         try {
             while (true) {
-                val server = ServerZip()
-                server.serverZip(args[1])
+                //val server = ServerZip()
+                server.serverZip(args[2], port)
                 println("Server Copy with compression complete!")
             }
         } catch (e: IOException) {
@@ -39,37 +44,35 @@ fun main(args: Array<String>) {
         }
 
     } else if (args[0] == "-client") {
+        val port = Integer.parseInt(args[1])
+        sourceDir = Paths.get(args[3])
         println("modification = client")
+        println(port)
+
+        val date = LocalDate.now()
 
         val temp = System.getProperty("java.io.tmpdir")
-        //println(System.getProperty("java.io.tmpdir"))
+        val tempFile = File("${temp}copy\\${sourceDir.fileName}$date.zip")
 
-        val mkdir = File("${temp}copy")
-        if (!mkdir.exists()) {
-            if (mkdir.mkdir()) {
-                println("Directory is created!")
-            } else {
-                println("Failed to create directory!")
-            }
+        if (!tempFile.exists()) {
+            makeDir(temp)
+
+            //sourceDir = Paths.get(args[3])
+            targetDir = Paths.get("${temp}copy\\${sourceDir.fileName}$date.zip")
+            val fileToZip = File(sourceDir.toString())
+            val fos = FileOutputStream(targetDir.toString())
+            val zipOut = ZipOutputStream(fos)
+
+            val zipFiles = Compress()
+            zipFiles.zipFolder(fileToZip, fileToZip.name, zipOut)
+            zipOut.close()
+            fos.close()
+            println("Compression complete!")
         }
-
-
-        sourceDir = Paths.get(args[2])
-        targetDir = Paths.get("${temp}copy\\${sourceDir.fileName}.zip")
-        val fileToZip = File(sourceDir.toString())
-        val fos = FileOutputStream(targetDir.toString())
-        val zipOut = ZipOutputStream(fos)
-
-        val zipFiles = Compress()
-        zipFiles.zipFolder(fileToZip, fileToZip.name, zipOut)
-        zipOut.close()
-        fos.close()
-
-        //G:\Downloads\Test\
 
         val client = ClientZip()
         try {
-            client.clientZip(args[1], "${temp}copy\\")
+            client.clientZip(port, args[2], "${temp}copy\\")
             deleteDir(Paths.get("${temp}copy\\"))
             println("Client Copy with compression complete!")
         } catch (e: ArrayIndexOutOfBoundsException) {
@@ -100,29 +103,28 @@ fun main(args: Array<String>) {
 }
 
 fun deleteDir(getDir: Path) {
-/*
-    walk(getDir)
-            .sorted(Comparator.reverseOrder())
-            .map(Path::toFile)
-            .forEach(File::delete)
-*/
+    Files.walkFileTree(getDir, object : SimpleFileVisitor<Path>() {
+        override fun postVisitDirectory(
+                dir: Path, exc: IOException?): FileVisitResult {
+            Files.delete(dir)
+            return FileVisitResult.CONTINUE
+        }
 
+        override fun visitFile(
+                file: Path, attrs: BasicFileAttributes): FileVisitResult {
+            Files.delete(file)
+            return FileVisitResult.CONTINUE
+        }
+    })
+}
 
-    Files.walkFileTree(getDir,
-            object : SimpleFileVisitor<Path>() {
-                @Throws(IOException::class)
-                override fun postVisitDirectory(
-                        dir: Path, exc: IOException?): FileVisitResult {
-                    Files.delete(dir)
-                    return FileVisitResult.CONTINUE
-                }
-
-                @Throws(IOException::class)
-                override fun visitFile(
-                        file: Path, attrs: BasicFileAttributes): FileVisitResult {
-                    Files.delete(file)
-                    return FileVisitResult.CONTINUE
-                }
-            })
-
+fun makeDir(temp: String) {
+    val mkdir = File("${temp}copy")
+    if (!mkdir.exists()) {
+        if (mkdir.mkdir()) {
+            println("Directory is created!")
+        } else {
+            println("Failed to create directory!")
+        }
+    }
 }

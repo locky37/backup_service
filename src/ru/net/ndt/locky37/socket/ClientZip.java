@@ -6,8 +6,8 @@ import java.net.Socket;
 
 public class ClientZip {
 
-    public void clientZip(String hostName, String srcDir) throws IOException {
-        int port = 3670;
+    public void clientZip(int port , String hostName, String srcDir) throws IOException {
+       // int port = 3670;
 
         File[] files = new File(srcDir).listFiles();
 
