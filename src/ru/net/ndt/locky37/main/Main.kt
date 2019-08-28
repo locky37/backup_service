@@ -18,6 +18,8 @@ import java.time.LocalDate
 
 fun main(args: Array<String>) {
 
+    val startTime = System.currentTimeMillis()
+
     val sourceDir: Path
     val targetDir: Path
 
@@ -63,10 +65,15 @@ fun main(args: Array<String>) {
             val fos = FileOutputStream(targetDir.toString())
             val zipOut = ZipOutputStream(fos)
 
+            //val zipFiles = Thread (Compress(fileToZip, fileToZip.name, zipOut));
+            //zipFiles.start()
+
             val zipFiles = Compress()
             zipFiles.zipFolder(fileToZip, fileToZip.name, zipOut)
             zipOut.close()
             fos.close()
+            val endTimeF = System.currentTimeMillis()
+            println("Time elapsed: ${endTimeF-startTime}")
             println("Compression complete!")
         }
 
@@ -75,6 +82,8 @@ fun main(args: Array<String>) {
             client.clientZip(port, args[2], "${temp}copy\\")
             deleteDir(Paths.get("${temp}copy\\"))
             println("Client Copy with compression complete!")
+            val endTime = System.currentTimeMillis()
+            println("Time elapsed: ${endTime-startTime}")
         } catch (e: ArrayIndexOutOfBoundsException) {
             println("Please enter hostname")
         }

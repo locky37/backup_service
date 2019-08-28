@@ -8,10 +8,10 @@ import java.lang.Exception
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-class Compress {
+class Compress() {
 
-    @Throws(IOException::class)
     fun zipFolder(fileToZip: File, fileName: String, zipFileSave: ZipOutputStream) {
+
         if (fileToZip.isHidden) {
             return
         }
@@ -28,13 +28,15 @@ class Compress {
 
             for (childFile in children!!) {
                 if (childFile.toString().endsWith(".1cl")
-                        || (childFile.toString().endsWith(".1CL"))
-                        || (childFile.toString().contains("Cv8FTxt"))
-                        || (childFile.toString().contains("1CHelpIndex"))
-                        || (childFile.toString().contains("1Cv8JobScheduler"))
+                    || (childFile.toString().endsWith(".1CL"))
+                    || (childFile.toString().contains("Cv8FTxt"))
+                    || (childFile.toString().contains("1CHelpIndex"))
+                    || (childFile.toString().contains("1Cv8JobScheduler"))
                 )
                 else listFiles.add(childFile)
             }
+
+            println("Num file: ${listFiles.size}")
 
             for (childFile in listFiles) {
                 println(childFile)
