@@ -1,39 +1,56 @@
-package ru.net.ndt.locky37.socket;
+package ru.net.ndt.locky37.socket
 
-import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.io.*
+import java.lang.Exception
+import java.net.InetAddress
+import java.net.Socket
 
-public class ClientZip {
+class ClientZip {
 
-    public void clientZip(int port , String hostName, String srcDir) throws IOException {
-       // int port = 3670;
+    /*    @Throws(IOException::class)*/
+    fun clientZip(port: Int, hostName: String, srcDir: String) {
+        // int port = 3670;
 
-        File[] files = new File(srcDir).listFiles();
+        val files = File(srcDir).listFiles()
 
-        Socket socket = new Socket(InetAddress.getByName(hostName), port);
+        val socket = Socket(InetAddress.getByName(hostName), port)
 
-        BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
-        DataOutputStream dos = new DataOutputStream(bos);
+        val bufferedOutputStream = BufferedOutputStream(socket.getOutputStream())
+        val dataInputStream = DataOutputStream(bufferedOutputStream)
 
-        dos.writeInt(files != null ? files.length : 0);
+        dataInputStream.writeInt(files?.size ?: 0)
 
-        for (File file : files != null ? files : new File[0]) {
-            long length = file.length();
-            dos.writeLong(length);
+        for (file in files ?: arrayOfNulls(0)) {
+            val length = file.length()
+            dataInputStream.writeLong(length)
 
-            String name = file.getName();
-            dos.writeUTF(name);
+            val name = file.name
+            dataInputStream.writeUTF(name)
 
-            FileInputStream fis = new FileInputStream(file);
-            BufferedInputStream bis = new BufferedInputStream(fis);
+            val fileInputStream = FileInputStream(file)
+            val bufferedInputStream = BufferedInputStream(fileInputStream)
 
-            int theByte;
-            while ((theByte = bis.read()) != -1) bos.write(theByte);
+            //bufferedInputStream.copyTo(bufferedOutputStream)
+            try {
+                bufferedInputStream.copyTo(bufferedOutputStream)
+            } catch (e: Exception) {
+                println("File LOCK")
+            }
+            finally {
+                bufferedInputStream.close()
+                fileInputStream.close()
 
-            bis.close();
+/*            while (bufferedInputStream.read() != 0) {
+                val theByte = bufferedInputStream.read()
+                bufferedOutputStream.write(theByte)*/
+            }
+
+/*            bufferedInputStream.close()
+            fileInputStream.close()*/
         }
 
-        dos.close();
+        bufferedOutputStream.close()
+        dataInputStream.close()
+        socket.close()
     }
 }
