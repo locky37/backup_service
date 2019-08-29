@@ -8,6 +8,7 @@ import java.util.zip.ZipOutputStream
 
 import ru.net.ndt.locky37.zip.Compress
 import ru.net.ndt.locky37.socket.*
+import java.lang.Exception
 import kotlin.system.exitProcess
 import java.nio.file.Paths
 import java.nio.file.FileVisitResult
@@ -15,6 +16,7 @@ import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.SimpleFileVisitor
 import java.time.LocalDate
+import kotlin.io.FileSystemException
 
 fun main(args: Array<String>) {
 
@@ -52,15 +54,16 @@ fun main(args: Array<String>) {
         println(port)
 
         val date = LocalDate.now()
+        val time = System.currentTimeMillis()
 
         val temp = System.getProperty("java.io.tmpdir")
-        val tempFile = File("${temp}copy\\${sourceDir.fileName}$date.zip")
+        val tempFile = File("${temp}copy\\${sourceDir.fileName}$time$date.zip")
 
         if (!tempFile.exists()) {
             makeDir(temp)
 
             //sourceDir = Paths.get(args[3])
-            targetDir = Paths.get("${temp}copy\\${sourceDir.fileName}$date.zip")
+            targetDir = Paths.get("${temp}copy\\${sourceDir.fileName}$time$date.zip")
             val fileToZip = File(sourceDir.toString())
             val fos = FileOutputStream(targetDir.toString())
             val zipOut = ZipOutputStream(fos)
@@ -73,7 +76,7 @@ fun main(args: Array<String>) {
             zipOut.close()
             fos.close()
             val endTimeF = System.currentTimeMillis()
-            println("Time elapsed: ${endTimeF-startTime}")
+            println("Time elapsed: ${endTimeF - startTime}")
             println("Compression complete!")
         }
 
@@ -83,7 +86,7 @@ fun main(args: Array<String>) {
             deleteDir(Paths.get("${temp}copy\\"))
             println("Client Copy with compression complete!")
             val endTime = System.currentTimeMillis()
-            println("Time elapsed: ${endTime-startTime}")
+            println("Time elapsed: ${endTime - startTime}")
         } catch (e: ArrayIndexOutOfBoundsException) {
             println("Please enter hostname")
         }
@@ -114,14 +117,24 @@ fun main(args: Array<String>) {
 fun deleteDir(getDir: Path) {
     Files.walkFileTree(getDir, object : SimpleFileVisitor<Path>() {
         override fun postVisitDirectory(
-                dir: Path, exc: IOException?): FileVisitResult {
-            Files.delete(dir)
+            dir: Path, exc: IOException?
+        ): FileVisitResult {
+            try {
+                Files.delete(dir)
+            } catch (e: Exception) {
+                println("E")
+            }
             return FileVisitResult.CONTINUE
         }
 
         override fun visitFile(
-                file: Path, attrs: BasicFileAttributes): FileVisitResult {
-            Files.delete(file)
+            file: Path, attrs: BasicFileAttributes
+        ): FileVisitResult {
+            try {
+                Files.delete(file)
+            } catch (e: Exception) {
+                println("E")
+            }
             return FileVisitResult.CONTINUE
         }
     })
