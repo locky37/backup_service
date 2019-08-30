@@ -10,6 +10,7 @@ import java.util.zip.ZipOutputStream
 
 class Compress() {
 
+    @Throws(IOException::class)
     fun zipFolder(fileToZip: File, fileName: String, zipFileSave: ZipOutputStream) {
 
         if (fileToZip.isHidden) {
@@ -58,8 +59,6 @@ class Compress() {
         } finally {
 
         }
-
-
 /*        val bytes = ByteArray(10000)
         var length: Int
         while ((length = fis.read(bytes)) >= 0) {

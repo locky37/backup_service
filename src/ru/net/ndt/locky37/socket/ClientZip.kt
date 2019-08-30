@@ -7,7 +7,7 @@ import java.net.Socket
 
 class ClientZip {
 
-    /*    @Throws(IOException::class)*/
+    @Throws(IOException::class)
     fun clientZip(port: Int, hostName: String, srcDir: String) {
         // int port = 3670;
 

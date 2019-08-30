@@ -2,10 +2,10 @@ package ru.net.ndt.locky37.socket
 
 import java.io.*
 import java.io.DataInputStream
-import java.net.Socket
 
-class ClientHandler(private val socket: Socket, private val dirDst: String, private var dataInputStream: DataInputStream): Thread() {
+class ClientHandler(private val dirDst: String, private var dataInputStream: DataInputStream): Thread() {
 
+    @Throws(IOException::class)
     override fun run() {
 
         println(Thread.currentThread().name)
@@ -17,7 +17,7 @@ class ClientHandler(private val socket: Socket, private val dirDst: String, priv
             val fileLength = dataInputStream.readLong()
             val fileName = dataInputStream.readUTF()
 
-            println("Copy File: $fileName")
+           ////println("Copy File: $fileName")
 
             files[i] = File("$dirDst/$fileName")
 
