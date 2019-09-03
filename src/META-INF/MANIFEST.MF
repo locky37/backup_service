@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: ru.net.ndt.locky37.main.MainKt
-
