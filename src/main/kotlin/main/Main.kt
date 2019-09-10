@@ -2,6 +2,8 @@ package main
 
 import Copy
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
+import com.google.gson.stream.MalformedJsonException
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import socket.Client
@@ -64,14 +66,14 @@ fun main(args: Array<String>) {
             logger.error(e.message)
         }
 
-    } else if (args[0] == "-client" || configFile.type == "Client") {
-        val port: Int = if (args[0].isNotEmpty() && args[0] == "-client") {
+    } else if (args.isNotEmpty() && args[0] == "-client" || configFile.type == "Client") {
+        val port: Int = if (args.isNotEmpty()) {
             Integer.parseInt(args[1])
         } else {
             configFile.port
         }
 
-        sourceDir = if (args[3].isNotEmpty()) {
+        sourceDir = if (args.isNotEmpty()) {
             Paths.get(args[3])
         } else {
             Paths.get(configFile.dir)
@@ -104,7 +106,7 @@ fun main(args: Array<String>) {
 
         val client = Client()
         try {
-            val host: String = if (args[2].isNotEmpty()) {
+            val host: String = if (args.isNotEmpty()) {
                 args[2]
             } else {
                 configFile.hostname
@@ -118,7 +120,7 @@ fun main(args: Array<String>) {
             println("Please enter hostname")
         }
 
-    } else if (args[0] == "-c") {
+    } else if (args.isNotEmpty() && args[0] == "-c") {
         logger.info("Start simple copy")
         sourceDir = Paths.get(args[1])
         targetDir = Paths.get(args[2])
@@ -131,7 +133,7 @@ fun main(args: Array<String>) {
         zipOut.close()
         fos.close()
         logger.info("Simple copy with compression complete!")
-    } else if (args[0].isNotEmpty() && args[1].isNotEmpty()) {
+    } else if (args.isNotEmpty() && args[0].isNotEmpty() && args[1].isNotEmpty()) {
         sourceDir = Paths.get(args[0])
         targetDir = Paths.get(args[1])
         Copy(sourceDir, targetDir)
@@ -191,15 +193,21 @@ fun jsonReader(): Config {
 
     var readFile: BufferedReader
     val writeFile: BufferedWriter
-
+    var jsonRead: Config?
     val gson = Gson()
 
     try {
         readFile = BufferedReader(FileReader(configFilePath))
-        val jsonRead: Config = gson.fromJson(readFile, Config::class.java)
+        jsonRead = gson.fromJson(readFile, Config::class.java)
         logger.info("Read file: conf.json")
         readFile.close()
         return Config(jsonRead.type, jsonRead.port, jsonRead.hostname, jsonRead.dir)
+    } catch (e: MalformedJsonException) {
+        logger.error(e.message)
+        exitProcess(0)
+    } catch (e: JsonSyntaxException) {
+        logger.error(e.message)
+        exitProcess(0)
     } catch (e: FileNotFoundException) {
         logger.error(e.message)
 
@@ -208,12 +216,8 @@ fun jsonReader(): Config {
         writeFile.write(jsonWrite)
         writeFile.close()
 
-        //logger.info("Create file: conf.json")
-
         readFile = BufferedReader(FileReader(configFilePath))
-        val jsonRead: Config = gson.fromJson(readFile, Config::class.java)
-        //println(File(configFile).bufferedReader().readLines())
-        //println(jsonRead.toString())
+        jsonRead = gson.fromJson(readFile, Config::class.java)
         logger.info("Create default file: conf.json")
         readFile.close()
         return Config(jsonRead.type, jsonRead.port, jsonRead.hostname, jsonRead.dir)

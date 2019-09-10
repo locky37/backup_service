@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'backup_service'
-version '2.0'
+version '2.2'
 
 sourceCompatibility = 1.8
 
@@ -21,14 +21,14 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-sourceSets {
+/*sourceSets {
     main.java.srcDirs += "src"
     main.resources.srcDirs += "resources"
     main.kotlin.srcDirs += "src"
     test.java.srcDirs += "test"
     test.kotlin.srcDirs += "test"
     test.resources.srcDirs += "testResources"
-}
+}*/
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
