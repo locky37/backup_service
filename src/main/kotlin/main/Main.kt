@@ -1,14 +1,13 @@
 package main
 
 import Copy
+import com.google.gson.Gson
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import socket.Client
 import socket.Server
 import zip.Compress
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
 import java.nio.file.*
 import java.util.zip.ZipOutputStream
 
@@ -20,10 +19,11 @@ import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.SimpleFileVisitor
 import java.time.LocalDate
-import kotlin.math.log
 
 
 fun main(args: Array<String>) {
+
+    val configFile = jsonReader()
 
     val startTime = System.currentTimeMillis()
 
@@ -32,33 +32,52 @@ fun main(args: Array<String>) {
     val sourceDir: Path
     val targetDir: Path
 
-    if (args.isEmpty()) {
-        println("Example Copy Dir: java -jar backup_service.jar source... target")
+    if (args.isEmpty() && configFile.dir == "C:/example") {
+        val fileContent = {}::class.java.getResource("/doc/README.MD").readText()
+        println(fileContent)
+/*        println("Example Copy Dir: java -jar backup_service.jar source... target")
         println("Example Copy Dir with ZIP: java -jar backup_service.jar -c source... target_file")
         println("Example Copy Dir with ZIP: java -jar backup_service.jar -server PORT target_dir")
         println("Example Copy Dir with ZIP: java -jar backup_service.jar -client PORT HOSTNAME source_dir")
+        println("OR Change default conf.json")*/
+        logger.info(configFile.dir)
         exitProcess(0)
-    } else if (args[0] == "-server") {
-        val port = Integer.parseInt(args[1])
+    } else if (args.isNotEmpty() && args[0] == "-server" || configFile.type == "Server") {
+        val port: Int = if (args.isNotEmpty()) {
+            Integer.parseInt(args[1])
+        } else {
+            configFile.port
+        }
+
         val server = Server()
-        //logger.info("Server running on port:$port")
-        //println(port)
 
         try {
             while (true) {
-                //val server = ServerZip()
-                server.serverZip(args[2], port)
+                if (args.isNotEmpty()) {
+                    server.serverZip(args[2], port)
+                } else {
+                    server.serverZip(configFile.dir, port)
+                }
                 logger.info("Server Copy with compression complete!")
             }
         } catch (e: IOException) {
-            e.printStackTrace()
+            logger.error(e.message)
         }
 
-    } else if (args[0] == "-client") {
-        val port = Integer.parseInt(args[1])
-        sourceDir = Paths.get(args[3])
+    } else if (args[0] == "-client" || configFile.type == "Client") {
+        val port: Int = if (args[0].isNotEmpty() && args[0] == "-client") {
+            Integer.parseInt(args[1])
+        } else {
+            configFile.port
+        }
+
+        sourceDir = if (args[3].isNotEmpty()) {
+            Paths.get(args[3])
+        } else {
+            Paths.get(configFile.dir)
+        }
+
         logger.info("Start copy")
-        //println(port)
 
         val date = LocalDate.now()
         val time = System.currentTimeMillis()
@@ -69,14 +88,10 @@ fun main(args: Array<String>) {
         if (!tempFile.exists()) {
             makeDir(temp)
 
-            //sourceDir = Paths.get(args[3])
             targetDir = Paths.get("${temp}copy\\${sourceDir.fileName}$time$date.zip")
             val fileToZip = File(sourceDir.toString())
             val fos = FileOutputStream(targetDir.toString())
             val zipOut = ZipOutputStream(fos)
-
-            //val zipFiles = Thread (Compress(fileToZip, fileToZip.name, zipOut));
-            //zipFiles.start()
 
             val zipFiles = Compress()
             zipFiles.zipFolder(fileToZip, fileToZip.name, zipOut)
@@ -89,7 +104,12 @@ fun main(args: Array<String>) {
 
         val client = Client()
         try {
-            client.clientZip(port, args[2], "${temp}copy\\")
+            val host: String = if (args[2].isNotEmpty()) {
+                args[2]
+            } else {
+                configFile.hostname
+            }
+            client.clientZip(port, host, "${temp}copy\\")
             deleteDir(Paths.get("${temp}copy\\"))
             logger.info("Client Copy with compression complete!")
             val endTime = System.currentTimeMillis()
@@ -100,7 +120,6 @@ fun main(args: Array<String>) {
 
     } else if (args[0] == "-c") {
         logger.info("Start simple copy")
-        //String sourceFile = "zipTest";
         sourceDir = Paths.get(args[1])
         targetDir = Paths.get(args[2])
         val fileToZip = File(sourceDir.toString())
@@ -151,12 +170,52 @@ fun deleteDir(getDir: Path) {
 }
 
 fun makeDir(temp: String) {
+
+    val logger: Logger = LogManager.getLogger("MakeDir")
+
     val mkdir = File("${temp}copy")
     if (!mkdir.exists()) {
         if (mkdir.mkdir()) {
-            println("Directory is created!")
+            logger.info("Directory is created!")
         } else {
-            println("Failed to create directory!")
+            logger.info("Failed to create directory!")
         }
+    }
+}
+
+fun jsonReader(): Config {
+
+    val logger: Logger = LogManager.getLogger("Main")
+
+    val configFilePath = "./conf.json"
+
+    var readFile: BufferedReader
+    val writeFile: BufferedWriter
+
+    val gson = Gson()
+
+    try {
+        readFile = BufferedReader(FileReader(configFilePath))
+        val jsonRead: Config = gson.fromJson(readFile, Config::class.java)
+        logger.info("Read file: conf.json")
+        readFile.close()
+        return Config(jsonRead.type, jsonRead.port, jsonRead.hostname, jsonRead.dir)
+    } catch (e: FileNotFoundException) {
+        logger.error(e.message)
+
+        writeFile = BufferedWriter(FileWriter(configFilePath))
+        val jsonWrite = gson.toJson(Config())
+        writeFile.write(jsonWrite)
+        writeFile.close()
+
+        //logger.info("Create file: conf.json")
+
+        readFile = BufferedReader(FileReader(configFilePath))
+        val jsonRead: Config = gson.fromJson(readFile, Config::class.java)
+        //println(File(configFile).bufferedReader().readLines())
+        //println(jsonRead.toString())
+        logger.info("Create default file: conf.json")
+        readFile.close()
+        return Config(jsonRead.type, jsonRead.port, jsonRead.hostname, jsonRead.dir)
     }
 }
