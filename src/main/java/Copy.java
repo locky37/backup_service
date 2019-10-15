@@ -1,4 +1,4 @@
-package ru.net.ndt.locky37.main;
+
 
 /*
  * Copyright (c) 2008, 2010, Oracle and/or its affiliates. All rights reserved.

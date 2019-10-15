@@ -1,5 +1,3 @@
-package ru.net.ndt.locky37.main;
-
 import java.io.File;
 import java.lang.management.ManagementFactory;
 

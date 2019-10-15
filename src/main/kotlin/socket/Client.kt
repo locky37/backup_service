@@ -1,14 +1,18 @@
-package ru.net.ndt.locky37.socket
+package socket
 
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 import java.io.*
 import java.lang.Exception
 import java.net.InetAddress
 import java.net.Socket
 
-class ClientZip {
+class Client {
 
-    /*    @Throws(IOException::class)*/
+    @Throws(IOException::class)
     fun clientZip(port: Int, hostName: String, srcDir: String) {
+
+        val logger: Logger = LogManager.getLogger(javaClass.simpleName)
         // int port = 3670;
 
         val files = File(srcDir).listFiles()
@@ -34,7 +38,7 @@ class ClientZip {
             try {
                 bufferedInputStream.copyTo(bufferedOutputStream)
             } catch (e: Exception) {
-                println("File LOCK")
+                logger.info("File LOCK: ${e.message}")
             }
             finally {
                 bufferedInputStream.close()

@@ -1,9 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="backup_service:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/backup_service_jar</output-path>
-    <root id="archive" name="backup_service.jar">
-      <element id="module-output" name="backup_service" />
-      <element id="extracted-dir" path="$KOTLIN_BUNDLED$/lib/kotlin-stdlib.jar" path-in-jar="/" />
-    </root>
-  </artifact>
-</component>

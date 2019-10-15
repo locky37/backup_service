@@ -1,5 +1,7 @@
-package ru.net.ndt.locky37.zip
+package zip
 
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
@@ -10,7 +12,10 @@ import java.util.zip.ZipOutputStream
 
 class Compress() {
 
+    @Throws(IOException::class)
     fun zipFolder(fileToZip: File, fileName: String, zipFileSave: ZipOutputStream) {
+
+        val logger: Logger = LogManager.getLogger(javaClass.simpleName)
 
         if (fileToZip.isHidden) {
             return
@@ -32,14 +37,14 @@ class Compress() {
                     || (childFile.toString().contains("Cv8FTxt"))
                     || (childFile.toString().contains("1CHelpIndex"))
                     || (childFile.toString().contains("1Cv8JobScheduler"))
-                )
+                ) logger.info("Ignored file: $childFile")
                 else listFiles.add(childFile)
             }
 
-            println("Num file: ${listFiles.size}")
+            logger.info("Num file: ${listFiles.size}")
 
             for (childFile in listFiles) {
-                println(childFile)
+                logger.info(childFile)
                 zipFolder(childFile, "$fileName/${childFile.name}", zipFileSave)
             }
             return
@@ -54,12 +59,10 @@ class Compress() {
         try {
             fileBuffer.copyTo(zipFileSave)
         } catch (e: Exception) {
-            println("File LOCK")
+            logger.info("File LOCK")
         } finally {
 
         }
-
-
 /*        val bytes = ByteArray(10000)
         var length: Int
         while ((length = fis.read(bytes)) >= 0) {
