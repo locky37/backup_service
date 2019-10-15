@@ -1,9 +1,9 @@
 package main
 
-import Copy
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.stream.MalformedJsonException
+import config.Config
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import socket.Client
@@ -37,14 +37,9 @@ fun main(args: Array<String>) {
     if (args.isEmpty() && configFile.dir == "C:/example") {
         val fileContent = {}::class.java.getResource("/doc/README.MD").readText()
         println(fileContent)
-/*        println("Example Copy Dir: java -jar backup_service.jar source... target")
-        println("Example Copy Dir with ZIP: java -jar backup_service.jar -c source... target_file")
-        println("Example Copy Dir with ZIP: java -jar backup_service.jar -server PORT target_dir")
-        println("Example Copy Dir with ZIP: java -jar backup_service.jar -client PORT HOSTNAME source_dir")
-        println("OR Change default conf.json")*/
         logger.info(configFile.dir)
         exitProcess(0)
-    } else if (args.isNotEmpty() && args[0] == "-server" || configFile.type == "Server") {
+    } else if (args.isNotEmpty() && args[0] == "-server" || args.isEmpty() && configFile.type == "Server") {
         val port: Int = if (args.isNotEmpty()) {
             Integer.parseInt(args[1])
         } else {
@@ -66,7 +61,7 @@ fun main(args: Array<String>) {
             logger.error(e.message)
         }
 
-    } else if (args.isNotEmpty() && args[0] == "-client" || configFile.type == "Client") {
+    } else if (args.isNotEmpty() && args[0] == "-client" || args.isEmpty() && configFile.type == "Client") {
         val port: Int = if (args.isNotEmpty()) {
             Integer.parseInt(args[1])
         } else {
@@ -133,13 +128,13 @@ fun main(args: Array<String>) {
         zipOut.close()
         fos.close()
         logger.info("Simple copy with compression complete!")
-    } else if (args.isNotEmpty() && args[0].isNotEmpty() && args[1].isNotEmpty()) {
+    } /*else if (args.isNotEmpty() && args[0].isNotEmpty() && args[1].isNotEmpty()) {
         sourceDir = Paths.get(args[0])
         targetDir = Paths.get(args[1])
         Copy(sourceDir, targetDir)
         //Files.walkFileTree(sourceDir, new Main(sourceDir, targetDir));
         logger.info("Copy complete!")
-    }
+    }*/
 }
 
 fun deleteDir(getDir: Path) {
@@ -211,7 +206,7 @@ fun jsonReader(): Config {
     } catch (e: FileNotFoundException) {
         logger.error(e.message)
 
-        writeFile = BufferedWriter(FileWriter(configFilePath))
+        writeFile = BufferedWriter(FileWriter(configFilePath) as Writer)
         val jsonWrite = gson.toJson(Config())
         writeFile.write(jsonWrite)
         writeFile.close()
